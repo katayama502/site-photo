@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My photo album</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+JP:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* 視点（パースペクティブ）の設定 */
+        .viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            perspective: 1000px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* スクロール用の高さを確保するコンテナ */
+        .scroll-container {
+            height: 99999vh; /* 無限スクロール用に大きく確保 */
+        }
+
+        /* 各パネルの基本スタイル */
+        .panel {
+            position: absolute;
+            width: 90vw;
+            height: 80vh;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 12px;
+            opacity: 0;
+            background-color: #000;
+            transform: translateZ(-1000px) scale(0.1);
+            will-change: transform, opacity;
+            pointer-events: none;
+        }
+
+        .panel.active {
+            pointer-events: auto;
+        }
+
+        .panel-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.85);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover .panel-bg {
+            transform: scale(1.1);
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .content h2 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .content p {
+            font-size: 1.1rem;
+            letter-spacing: 0.1em;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 装飾的なナビゲーション */
+        .ui-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+        }
+
+        .progress-indicator {
+            position: absolute;
+            left: 50%;
+            bottom: 3rem;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            pointer-events: auto;
+        }
+
+        .step {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.3);
+            transition: color 0.3s;
+        }
+
+        .step.active {
+            color: #fff;
+        }
+
+        /* スマホ対応 */
+        @media (max-width: 600px) {
+            .content h2 {
+                font-size: 1.5rem;
+            }
+            .content p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* 画面中央のレティクル（装飾） */
+        .reticle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-container"></div>
+
+    <div class="viewport">
+        <div class="reticle"></div>
+        
+        <!-- Panel 1 -->
+        <div class="panel" data-index="0">
+            <div class="panel-bg" style="background-image: url(./img/DSCF1330.jpg)"></div>
+            <div class="content">
+                <h2>はじまり</h2>
+                <p>ここから新しい挑戦がはじまる。</p>
+            </div>
+        </div>
+
+        <!-- Panel 2 -->
+        <div class="panel" data-index="1">
+            <div class="panel-bg" style="background-image: url(./img/DSCF1381.jpg)"></div>
+            <div class="content">
+                <h2>夢</h2>
+                <p>全ての人々に優しいITを広める。</p>
+            </div>
+        </div>
+
+        <!-- Panel 3 -->
+        <div class="panel" data-index="2">
+            <div class="panel-bg" style="background-image: url(./img/DSCF1822.jpg)"></div>
+            <div class="content">
+                <h2>記憶</h2>
+                <p>過去の自分の経験がこれからの夢を作った</p>
+            </div>
+        </div>
+
+        <!-- Panel 4 -->
+        <div class="panel" data-index="3">
+            <div class="panel-bg" style="background-image: url(./img/DSCF1846.jpg)"></div>
+            <div class="content">
+                <h2>挑戦</h2>
+                <p>ここからが、本番！全力で勝負！</p>
+            </div>
+        </div>
+
+        <!-- Panel 5 -->
+        <div class="panel" data-index="4">
+            <div class="panel-bg" style="background-image: url(./img/DSCF1880.jpg)"></div>
+            <div class="content">
+                <h2>未来</h2>
+                <p>自分も相手も共に新たな未来を作り出す！</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui-layer">
+        <div class="flex justify-between items-center pointer-events-auto">
+            <div class="text-xs tracking-[0.4em] font-bold">My photo album</div>
+        </div>
+        
+        <div class="progress-indicator">
+            <span class="step active">01</span>
+            <span class="step">02</span>
+            <span class="step">03</span>
+            <span class="step">04</span>
+            <span class="step">05</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const panels = document.querySelectorAll('.panel');
+            const steps = document.querySelectorAll('.step');
+            const totalPanels = panels.length;
+            
+            // スクロールに応じたアニメーションの更新
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                const windowHeight = window.innerHeight;
+                
+                // 1つのパネルあたりのスクロール量
+                const scrollStep = windowHeight;
+                // 全パネル1周分のスクロール量
+                const totalScroll = scrollStep * totalPanels;
+                // 現在のスクロール位置をループ内に収める
+                const loopedScroll = scrolled % totalScroll;
+
+                panels.forEach((panel, i) => {
+                    // ループしたスクロール位置で各パネルの進捗を計算
+                    const startPos = i * scrollStep;
+                    const progress = (loopedScroll - startPos) / scrollStep;
+
+                    let opacity = 0;
+                    let zTranslation = -1000;
+                    let scale = 0.1;
+
+                    if (progress > -1 && progress < 1) {
+                        if (progress <= 0) {
+                            const t = progress + 1;
+                            opacity = t;
+                            zTranslation = -1000 * (1 - t);
+                            scale = 0.1 + (0.9 * t);
+                        } else {
+                            const t = progress;
+                            opacity = 1 - t;
+                            zTranslation = 500 * t;
+                            scale = 1 + (2.0 * t);
+                        }
+                        panel.style.visibility = 'visible';
+                        panel.classList.add('active');
+                    } else {
+                        // 最初のパネルが最後の直後に続くようにラップアラウンド対応
+                        // (最後→最初の繋ぎ目)
+                        const wrappedProgress = (loopedScroll - startPos + totalScroll) % totalScroll / scrollStep;
+                        if (i === 0) {
+                            const altProgress = (loopedScroll - totalScroll) / scrollStep;
+                            if (altProgress > -1 && altProgress < 1) {
+                                if (altProgress <= 0) {
+                                    const t = altProgress + 1;
+                                    opacity = t;
+                                    zTranslation = -1000 * (1 - t);
+                                    scale = 0.1 + (0.9 * t);
+                                } else {
+                                    const t = altProgress;
+                                    opacity = 1 - t;
+                                    zTranslation = 500 * t;
+                                    scale = 1 + (2.0 * t);
+                                }
+                                panel.style.visibility = 'visible';
+                                panel.classList.add('active');
+                            } else {
+                                panel.style.visibility = 'hidden';
+                                panel.classList.remove('active');
+                            }
+                        } else {
+                            panel.style.visibility = 'hidden';
+                            panel.classList.remove('active');
+                        }
+                    }
+
+                    panel.style.opacity = opacity;
+                    panel.style.transform = `translateZ(${zTranslation}px) scale(${scale})`;
+
+                    // インジケーターの更新（ループ対応）
+                    const normProgress = ((loopedScroll / scrollStep) - i + totalPanels) % totalPanels;
+                    const directProgress = (loopedScroll - i * scrollStep) / scrollStep;
+                    if (directProgress > -0.5 && directProgress < 0.5) {
+                        steps.forEach(s => s.classList.remove('active'));
+                        if (steps[i]) steps[i].classList.add('active');
+                    }
+                });
+            });
+            
+            // 初期状態のトリガー
+            window.dispatchEvent(new Event('scroll'));
+        });
+    </script>
+</body>
+</html>
